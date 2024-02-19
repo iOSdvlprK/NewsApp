@@ -14,6 +14,16 @@ enum NetworkError: Error {
 }
 
 class Webservice {
+    func fetchSources(url: URL?) async throws -> [NewsSource] {
+        guard let url = url else {
+            return []
+        }
+        
+        let (data, _) = try await URLSession.shared.data(from: url)
+        let newsSourceResponse = try? JSONDecoder().decode(NewsSourceResponse.self, from: data)
+        return newsSourceResponse?.sources ?? []
+    }
+    
     func fetchSources(url: URL?, completion: @escaping (Result<[NewsSource], NetworkError>) -> Void) {
         guard let url = url else {
             completion(.failure(.badUrl))
